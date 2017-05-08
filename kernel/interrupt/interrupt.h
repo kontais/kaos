@@ -2,5 +2,5 @@
 
 namespace interrupt
 {
-    void init();
+	void init();
 }

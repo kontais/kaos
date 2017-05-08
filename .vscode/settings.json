@@ -1,4 +1,6 @@
 // Platzieren Sie Ihre Einstellungen in dieser Datei, um Standard- und Benutzereinstellungen zu überschreiben.
 {
-    "files.eol": "\n"
+    "files.eol": "\n",
+    "editor.insertSpaces": false,
+    "editor.tabSize": 4
 }
