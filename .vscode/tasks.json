@@ -12,8 +12,8 @@
             "taskName": "build",
             "isBuildCommand": true,
             "command": "c:\\windows\\sysnative\\bash.exe",
-            //"args": [ "-c", "./iso.sh" ],
-            "args": [ "-c", "./qemu.sh" ],
+            "args": [ "-c", "make iso" ],
+            //"args": [ "-c", "make qemu-X" ],
             "":""
         }
     ]
