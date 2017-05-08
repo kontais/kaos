@@ -1,0 +1,20 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "command": "echo",
+    "isShellCommand": true,
+    "args": ["Hello World"],
+    "showOutput": "always",
+
+    "tasks": [
+        {
+            "taskName": "build",
+            "isBuildCommand": true,
+            "command": "c:\\windows\\sysnative\\bash.exe",
+            //"args": [ "-c", "./iso.sh" ],
+            "args": [ "-c", "./qemu.sh" ],
+            "":""
+        }
+    ]
+}

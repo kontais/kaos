@@ -1,0 +1,61 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "/usr/include",
+                "/usr/local/include"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "",
+                "path": [
+                    "/usr/include",
+                    "/usr/local/include"
+                ]
+            }
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "/usr/include",
+                "/usr/local/include"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "",
+                "path": [
+                    "/usr/include",
+                    "/usr/local/include"
+                ]
+            }
+        },
+        {
+            "name": "Win32",
+            "includePath": [
+                "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/*",
+                "C:/Users/Lousyphreak/AppData/Local/lxss/rootfs/usr/include/c++/5",
+                "C:/Users/Lousyphreak/AppData/Local/lxss/rootfs/usr/include/x86_64-linux-gnu/c++/5",
+                "C:/Users/Lousyphreak/AppData/Local/lxss/rootfs/usr/include/c++/5/backward",
+                "C:/Users/Lousyphreak/AppData/Local/lxss/rootfs/usr/lib/gcc/x86_64-linux-gnu/5/include",
+                "C:/Users/Lousyphreak/AppData/Local/lxss/rootfs/usr/local/include",
+                "C:/Users/Lousyphreak/AppData/Local/lxss/rootfs/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed",
+                "C:/Users/Lousyphreak/AppData/Local/lxss/rootfs/usr/include"
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "",
+                "path": [
+                    "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include/*",
+                    "C:/Users/Lousyphreak/AppData/Local/lxss/rootfs/usr/include/c++/5",
+                    "C:/Users/Lousyphreak/AppData/Local/lxss/rootfs/usr/include/x86_64-linux-gnu/c++/5",
+                    "C:/Users/Lousyphreak/AppData/Local/lxss/rootfs/usr/include/c++/5/backward",
+                    "C:/Users/Lousyphreak/AppData/Local/lxss/rootfs/usr/lib/gcc/x86_64-linux-gnu/5/include",
+                    "C:/Users/Lousyphreak/AppData/Local/lxss/rootfs/usr/local/include",
+                    "C:/Users/Lousyphreak/AppData/Local/lxss/rootfs/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed",
+                    "C:/Users/Lousyphreak/AppData/Local/lxss/rootfs/usr/include"
+                ]
+            }
+        }
+    ]
+}
