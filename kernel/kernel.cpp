@@ -1,3 +1,4 @@
+#include "bootstrap/multiboot.h"
 #include <stddef.h>
 #include <stdint.h>
  
@@ -16,11 +17,11 @@
 
 const extern void* _text_start;
 
+
 #if defined(__cplusplus)
 extern "C" /* Use C linkage for kernel_main. */
 #endif
-void kernel_main(void) {
-	_text_start;
+void kernel_main(int32_t multibootMagic, multiboot::Header* multibootHeader) {
 	screen::initialize();
 
 	interrupt::init();
@@ -28,7 +29,12 @@ void kernel_main(void) {
 	for(int i=0;i<1;i++)
 		screen::write("Hello kernel World!!\nMULTILINE! :D\na\n");
 
-	
+	multiboot::parseMultiboot(multibootHeader);
+	//screen::write("\nmultiboot boot_loader_name addr: ");
+	//screen::writePtr((void*)multibootInfo->boot_loader_name);
+	//screen::write("\nmultiboot boot_loader_name: ");
+	//screen::write((const char*)multibootInfo->boot_loader_name);
+	screen::write("\n");
 	
 	
 	screen::write("the end!\n");

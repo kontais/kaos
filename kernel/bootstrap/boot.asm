@@ -5,7 +5,8 @@ section .text
 bits 32
 _start:
 	mov esp, stack_top
-	mov edi, ebx        ; Move multiboot info pointer to edi
+	mov edi, eax        ; Move multiboot info pointer to edi
+	mov esi, ebx        ; Move multiboot info pointer to edi
 
 	call check_multiboot
 	call check_cpuid

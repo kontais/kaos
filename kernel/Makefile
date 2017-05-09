@@ -1,4 +1,5 @@
 OBJ = \
+	bootstrap/multiboot.o \
 	interrupt/interrupt.o \
 	screen/screen.o \
 	paging/paging.o \
