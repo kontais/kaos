@@ -71,11 +71,10 @@ SECTIONS
 	.other : AT(ADDR(.other) - _kernel_virtual_offset + _kernel_physical_base)
 	{
 		*(.debug*)
+		. = ALIGN(4K);
 	}
 	
 	_other_end = .;
-
-	. = ALIGN(4K);
 	_stack_start = .;
 
 	.stack : AT(ADDR(.stack) - _kernel_virtual_offset + _kernel_physical_base)

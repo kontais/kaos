@@ -14,6 +14,7 @@
 
 #include "screen/screen.h"
 #include "interrupt/interrupt.h"
+#include "paging/paging.h"
 
 const extern void* _text_start;
 
@@ -24,7 +25,7 @@ extern "C" /* Use C linkage for kernel_main. */
 void kernel_main(int32_t multibootMagic, multiboot::Header* multibootHeader) {
 	screen::initialize();
 
-	interrupt::init();
+	//interrupt::init();
 
 	for(int i=0;i<1;i++)
 		screen::write("Hello kernel World!!\nMULTILINE! :D\na\n");
@@ -37,5 +38,6 @@ void kernel_main(int32_t multibootMagic, multiboot::Header* multibootHeader) {
 	screen::write("\n");
 	
 	
-	screen::write("the end!\n");
+	paging::init();
+	//screen::write("the end!\n");
 }
