@@ -94,7 +94,8 @@ enable_paging:
 	; set the long mode bit in the EFER MSR (model specific register)
 	mov ecx, 0xC0000080
 	rdmsr
-	or eax, 1 << 8
+	or eax, 1 << 8  ; IA-32e mode enable (LME)
+	or eax, 1 << 11 ; Execute-disable bit enable (NXE)
 	wrmsr
 
 	; enable paging in the cr0 register
