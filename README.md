@@ -6,4 +6,4 @@
 * 0xFFFFFFFF00000000 --> unmapped - 
 * 0xFFFFFFFF40000000 --> unmapped - kernel heap
 * 0xFFFFFFFF80000000 --> 0x400000 - page tables, 2MB page used
-* 0xFFFFFFFFC0000000 --> 0x200000 - kernel, 2MB page used
+* 0xFFFFFFFFC0000000 --> 0x200000 - kernel, fine granularity with NX
