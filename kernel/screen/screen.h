@@ -1,9 +1,7 @@
 #pragma once
 
 #include <stdint.h>
-#define __ELF__
-#define _LIBCPP_HAS_NO_THREADS
-#include "../stdlib/type_traits"
+#include <type_traits>
 
 namespace screen
 {
@@ -55,6 +53,7 @@ namespace screen
 		ForegroundColor fgColor = ForegroundColor::LightGrey,
 		BackgroundColor bgColor = BackgroundColor::Black);
 
+	void writeByte(int byte);
 	void writePtr(const void* ptr);
 	void writeInt(int64_t i);
 

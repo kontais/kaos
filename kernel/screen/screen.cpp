@@ -81,6 +81,30 @@ void screen::write(const char* text, ForegroundColor fgColor, BackgroundColor bg
 			putChar(*c, fgColor, bgColor);
 	}
 }
+void screen::writeByte(int byte)
+{
+	char c = (byte >> 4) & 0xf;
+	if(c>9)
+	{
+		c += 'A' - 10;
+	}
+	else
+	{
+		c += '0';
+	}
+	putChar(c);
+
+	c = (byte >> 0) & 0xf;
+	if(c>9)
+	{
+		c += 'A' - 10;
+	}
+	else
+	{
+		c += '0';
+	}
+	putChar(c);
+}
 
 void screen::writePtr(const void* ptr)
 {
