@@ -1,0 +1,3 @@
+[submodule "kernel/libcxx"]
+	path = kernel/libcxx
+	url = https://github.com/llvm-mirror/libcxx.git
