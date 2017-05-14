@@ -14,7 +14,7 @@
 
 #include "screen/screen.h"
 #include "interrupt/interrupt.h"
-#include "paging/paging.h"
+#include "mm/paging.h"
 
 const extern void* _text_start;
 
