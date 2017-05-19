@@ -21,19 +21,105 @@ static void zeromem(void* target, uint64_t count)
 // info tab
 // 0 4 8 C
 // where in memory will be the initial pagetagles
-const auto initialPagingOffset = (uint64_t*)0x400000;
-auto pagingOffset = initialPagingOffset;
+uint8_t* const physicalPageTable = (uint8_t*)0x400000ULL;
+uint8_t* const mappedPageTable = (uint8_t*)0xFFFFFFFF80000000ULL;
 
-paging::PTInfo allocatePageTablePage()
+class PageTables
 {
-	static auto currentPagingOffset = initialPagingOffset;
-	uint64_t* page = (uint64_t*)currentPagingOffset;
-	currentPagingOffset += paging::pageSize / sizeof(uint64_t*);
+public:
+	void init()
+	{
+		zeromem(physicalPageTable, pageTableMapSize);
 
-	zeromem(page, 4096);
+		nextFreePageTable = physicalPageTable;
+		masterPageTable = physicalPageTable;
+		physicalMapping[0] = (uint64_t)physicalPageTable;
+		for(uint64_t i = 1; i < PageTables::numPagetableMappings; ++i)
+			physicalMapping[i] = 0;
 
-	return {reinterpret_cast<uint64_t>(page), page};
-}
+		for(uint64_t i = 0; i < (pageTableMapSize / pageSize) - 1; ++i)
+		{
+			int64_t* p = (int64_t*)&physicalPageTable[i * pageSize];
+			*p = pageSize; // point to next free page
+		}
+
+		// reserve master page table
+		allocatePageTablePage();
+	}
+
+	void mapPageTableTo(void* linearAddress)
+	{
+		auto pt = getPhysicalOffset(nextFreePageTable);
+
+	screen::write("\nmapPageTableTo:");
+	screen::writePtr(linearAddress);
+	screen::write("\nnextFreePageTable:");
+	screen::writePtr(nextFreePageTable);
+	screen::write(" --> ");
+	screen::writePtr((void*)pt);
+
+		masterPageTable = (uint8_t *)linearAddress;
+		nextFreePageTable = (uint8_t *)getVirtualOffset(pt);
+	screen::write("\nnextFreePageTable:");
+	screen::writePtr(nextFreePageTable);
+	screen::write(" --> ");
+	screen::writePtr(nextFreePageTable);
+	}
+
+	uint64_t getPhysicalOffset(void* address)
+	{
+		auto offsetRaw = reinterpret_cast<uint64_t>(address) - reinterpret_cast<uint64_t>(masterPageTable);
+		auto offsetMapping = offsetRaw / pageTableMapSize;
+		auto offsetWithinMapping = offsetRaw % pageTableMapSize;
+
+		return physicalMapping[offsetMapping] + offsetWithinMapping;
+	}
+
+	void* getVirtualOffset(uint64_t address)
+	{
+		for(uint64_t i = 0; i < numPagetableMappings; ++i)
+		{
+			const auto physicalOffset = physicalMapping[i];
+			if(address >= physicalOffset && address < (physicalOffset + pageTableMapSize))
+			{
+				auto virtualOffset = masterPageTable + (i * pageTableMapSize);
+				return virtualOffset + address - physicalOffset;
+			}
+		}
+		return nullptr;
+	}
+
+	void* allocatePageTablePage()
+	{
+		uint64_t* page = (uint64_t*)nextFreePageTable;
+
+		int64_t* nextFree = (int64_t*)nextFreePageTable;
+		nextFreePageTable = nextFreePageTable + *nextFree;
+	screen::write("\nnextFreePageTable:");
+	screen::writePtr(nextFreePageTable);
+
+		zeromem(page, 4096);
+
+		return page;
+	}
+
+	uint64_t* getMasterPageTable()
+	{
+		return (uint64_t*)masterPageTable;
+	}
+
+
+private:
+	static constexpr uint64_t pageTableMapSize = 0x200000ULL;
+	static constexpr uint64_t pageSize = 4096;
+	static constexpr uint64_t numPagetableMappings = 512;
+
+	uint8_t* nextFreePageTable;
+	uint64_t physicalMapping[numPagetableMappings];
+	uint8_t* masterPageTable;
+};
+
+PageTables pageTables;
 
 void mapPage(uint64_t physicalAddress, const void* linearAddress, const bool use2MB, const uint64_t flags = paging::writeable)
 {
@@ -47,12 +133,13 @@ void mapPage(uint64_t physicalAddress, const void* linearAddress, const bool use
 
 	uint64_t lAddr = (uint64_t)linearAddress;
 	auto p4Offset = (lAddr >> (12+9+9+9)) & 0x1FF;
-	auto p4Entry = &pagingOffset[p4Offset];
+	auto p4Entry = &pageTables.getMasterPageTable()[p4Offset];
 
 	if(!(*p4Entry & present))
 	{
-		auto page = allocatePageTablePage();
-		*p4Entry = (page.physicalAddress  & addressMask) | present | writeable;
+		auto page = pageTables.allocatePageTablePage();
+		auto pagePhysical = pageTables.getPhysicalOffset(page);
+		*p4Entry = (pagePhysical  & addressMask) | present | writeable;
 	}
 
 	screen::write("\np4Offset:");
@@ -60,24 +147,26 @@ void mapPage(uint64_t physicalAddress, const void* linearAddress, const bool use
 	screen::write(" p4Entry:");
 	writePtr((void*)*p4Entry);
 
-	const auto p3Base = (uint64_t*)(*p4Entry & addressMask);
+	const auto p3Base = (uint64_t*)pageTables.getVirtualOffset(*p4Entry & addressMask);
 	auto p3Offset = (lAddr >> (12+9+9)) & 0x1FF;
 	auto p3Entry = &p3Base[p3Offset];
-
-	if(!(*p3Entry & present))
-	{
-		auto page = allocatePageTablePage();
-		*p3Entry = (page.physicalAddress  & addressMask) | present | writeable;
-	}
 
 	screen::write("\np3Offset:");
 	writeInt(p3Offset);
 	screen::write(" p3Base:");
 	writePtr((void*)p3Base);
+
+	if(!(*p3Entry & present))
+	{
+		auto page = pageTables.allocatePageTablePage();
+		auto pagePhysical = pageTables.getPhysicalOffset(page);
+		*p3Entry = (pagePhysical  & addressMask) | present | writeable;
+	}
+
 	screen::write(" p3Entry:");
 	writePtr((void*)*p3Entry);
 
-	const auto p2Base = (uint64_t*)(*p3Entry & addressMask);
+	const auto p2Base = (uint64_t*)pageTables.getVirtualOffset(*p3Entry & addressMask);
 	auto p2Offset = (lAddr >> (12+9)) & 0x1FF;
 	auto p2Entry = &p2Base[p2Offset];
 
@@ -96,8 +185,9 @@ void mapPage(uint64_t physicalAddress, const void* linearAddress, const bool use
 		}
 		else
 		{
-			auto page = allocatePageTablePage();
-			*p2Entry = (page.physicalAddress  & addressMask) | present | writeable;
+			auto page = pageTables.allocatePageTablePage();
+			auto pagePhysical = pageTables.getPhysicalOffset(page);
+			*p2Entry = (pagePhysical  & addressMask) | present | writeable;
 		}
 	}
 
@@ -108,7 +198,7 @@ void mapPage(uint64_t physicalAddress, const void* linearAddress, const bool use
 	screen::write(" p2Entry:");
 	writePtr((void*)*p2Entry);
 
-	const auto p1Base = (uint64_t*)(*p2Entry & addressMask);
+	const auto p1Base = (uint64_t*)pageTables.getVirtualOffset(*p2Entry & addressMask);
 	auto p1Offset = (lAddr >> (12)) & 0x1FF;
 	auto p1Entry = &p1Base[p1Offset];
 
@@ -146,10 +236,9 @@ void map(uint64_t physicalAddress, const void* linearAddress, int64_t size, cons
 
 void paging::init()
 {
-	// allocate root page
-	allocatePageTablePage();
-	mapPage(0, (void*)0, true);
-	mapPage((int64_t)initialPagingOffset, (void*)0xFFFFFFFF80000000, true);
+	pageTables.init();
+
+	mapPage((int64_t)physicalPageTable, mappedPageTable, true);
 
 	KMAP(rodata, executeDisable);
 	KMAP(text, 0);
@@ -159,9 +248,12 @@ void paging::init()
 	KMAP(other, writeable | executeDisable);
 	KMAP(stack, writeable | executeDisable);
 
+	mapPage(0, (void*)0, true);
 
 	asm volatile("movq %%rax, %%cr3;"
 					:
-					: "a" (initialPagingOffset)
+					: "a" (physicalPageTable)
 					: );
+
+	pageTables.mapPageTableTo(mappedPageTable);
 }
