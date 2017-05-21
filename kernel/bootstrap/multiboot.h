@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 
 
 namespace multiboot
@@ -11,5 +11,34 @@ namespace multiboot
 		uint32_t reserved;
 	};
 
-	void parseMultiboot(const Header* header);
+	enum class MemoryType
+	{
+		Available = 1,
+		Reserved = 2,
+		AcpiReclaimable = 3,
+		AcpiNVS = 4,
+		BadMemory = 5,
+		Pci = 11, // unknown?
+	};
+
+	struct MemoryMapEntry
+	{
+		uint64_t start;
+		uint64_t length;
+		MemoryType type;
+	};
+
+	constexpr auto memoryMapEntries = 32;
+	struct MemoryMap
+	{
+		int count;
+		MemoryMapEntry entries[memoryMapEntries];
+	};
+
+	struct MultibootInfo
+	{
+		MemoryMap memoryMap;
+	};
+
+	MultibootInfo parseMultiboot(const Header* header);
 }

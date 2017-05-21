@@ -42,7 +42,7 @@ struct MultibyteTag
 		} bootLoaderName;
 	};
 };
-struct MemoryMapEntry
+struct MBMemoryMapEntry
 {
 	uint64_t baseAddress;
 	uint64_t length;
@@ -50,8 +50,10 @@ struct MemoryMapEntry
 	uint32_t reserved;
 };
 
-void multiboot::parseMultiboot(const Header* header)
+multiboot::MultibootInfo multiboot::parseMultiboot(const Header* header)
 {
+	MultibootInfo ret;
+
 	screen::write("multiboot info location: ");
 	screen::writePtr(header);
 	screen::write("\nmultiboot length: ");
@@ -79,9 +81,11 @@ void multiboot::parseMultiboot(const Header* header)
 			char* entryC = (char*)currentTag->memoryMap.entries;
 			char* entryEnd = entryC+currentTag->size;
 
+			ret.memoryMap.count = 0;
+
 			while(entryC < entryEnd)
 			{
-				MemoryMapEntry* entry = (MemoryMapEntry*)entryC;
+				MBMemoryMapEntry* entry = (MBMemoryMapEntry*)entryC;
 
 				screen::write("\nbase: ");
 				screen::writePtr((void*)entry->baseAddress);
@@ -92,6 +96,14 @@ void multiboot::parseMultiboot(const Header* header)
 				screen::write("  reserved: ");
 				screen::writeInt(entry->reserved);
 
+				if(ret.memoryMap.count < memoryMapEntries)
+				{
+					ret.memoryMap.entries[ret.memoryMap.count].start = entry->baseAddress;
+					ret.memoryMap.entries[ret.memoryMap.count].length = entry->length;
+					ret.memoryMap.entries[ret.memoryMap.count].type = (MemoryType)entry->type;
+					ret.memoryMap.count++;
+				}
+
 				entryC += currentTag->memoryMap.entrySize;
 			}
 		}
@@ -99,4 +111,6 @@ void multiboot::parseMultiboot(const Header* header)
 		const auto paddedSize = (currentTag->size+7) & 0xFFFFFFF8U;
 		currentLoc += paddedSize;
 	}
+
+	return ret;
 }
