@@ -29,8 +29,13 @@ void kernel_main(int32_t /*multibootMagic*/, multiboot::Header* multibootHeader)
 	const auto multibootInfo = multiboot::parseMultiboot(multibootHeader);
 	paging::allocator::initEarly(multibootInfo.memoryMap);
 	paging::init();
+	interrupt::init();
 
-	//interrupt::init();
+	/////////////////////////////////////////
+	// HEAP available starting here
+	/////////////////////////////////////////
+
+
 
 	//screen::write("\nmultiboot boot_loader_name addr: ");
 	//screen::writePtr((void*)multibootInfo->boot_loader_name);

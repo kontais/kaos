@@ -1,6 +1,53 @@
 #include "interrupt.h"
-#include <stdint.h>
+#include <cstdint>
 #include "../screen/screen.h"
+
+/**
+ Interrupt Table: (intel manual: 6.4.1)
+ 0     #DE    Divide Error
+              DIV and IDIV instructions.
+ 1     #DB    Debug
+              Any code or data reference.
+ 2     NMI    Interrupt
+              Non-maskable external interrupt.
+ 3     #BP    Breakpoint
+              INT 3 instruction.
+ 4     #OF    Overflow
+              INTO instruction.
+ 5     #BR    BOUND Range Exceeded
+              BOUND instruction.
+ 6     #UD    Invalid Opcode (UnDefined Opcode)
+              UD instruction or reserved opcode.
+ 7     #NM    Device Not Available (No Math Coprocessor)
+              Floating-point or WAIT/FWAIT instruction
+ 8     #DF    Double Fault
+              Any instruction that can generate an exception, an NMI, or an INTR.
+ 9     #MF    CoProcessor Segment Overrun (reserved)
+              Floating-point instruction.
+10     #TS    Invalid TSS
+              Task switch or TSS access.
+11     #NP    Segment Not Present
+              Loading segment registers or accessing system segments.
+12     #SS    Stack Segment Fault
+              Stack operations and SS register loads.
+13     #GP    General Protection
+              Any memory reference and other protection checks.
+14     #PF    Page Fault
+              Any memory reference.
+15     Reserved
+16     #MF    Floating-Point Error (Math Fault)
+              Floating-point or WAIT/FWAIT instruction.
+17     #AC    Alignment Check
+              Any data reference in memory.
+18     #MC    Machine Check
+              Error codes (if any) and source are model dependent.
+19     #XM    SIMD Floating-Point Exception
+              SIMD Floating-Point Instruction
+20     #VE    Virtualization Exception
+              EPT violations
+21-31  Reserved
+32-255 Maskable Interrupts External interrupt from INTR pin or INT n instruction.
+*/
 
 namespace interrupt
 {
@@ -105,6 +152,7 @@ void setISR(int interrupt, void(*handler)(interrupt_frame*), uint16_t selector, 
 	idt[interrupt].ist = 0;
 	idt[interrupt].zero = 0;
 
+#if 0
    	screen::write("setup interrupt(");
 	screen::writeInt(interrupt);
    	screen::write(")\n  offset1: ");
@@ -122,22 +170,12 @@ void setISR(int interrupt, void(*handler)(interrupt_frame*), uint16_t selector, 
    	screen::write("\n  zero: ");
 	screen::writeInt(idt[interrupt].zero);
    	screen::write("\n");
+#endif
+}
 }
 
-
-void init()
+void interrupt::init()
 {
-	const char* cc = "some test";
-	screen::printnl(cc, "some test", 12345, screen::format::Hex{}, 0x12345);
-	//initGDT();
-   	screen::write("Initialize IDT\nptr: ");
-	screen::writePtr(idt);
-   	screen::write("\nsizeof(IDTDescription): ");
-	screen::writeInt(sizeof(IDTDescription));
-   	screen::write("\nsizeof(idt): ");
-	screen::writeInt(sizeof(idt));
-   	screen::write("\n");
-
 	idtPointer.limit = sizeof(IDTDescription) * 256 -1;
 	idtPointer.base = reinterpret_cast<uint64_t>(&idt[0]);
 
@@ -170,12 +208,18 @@ void init()
    	screen::write("Enable IDT\n");
 	//asm volatile("lgdt %0" : : "m" (gdtp));
 	asm volatile("lidt %0" : : "m" (idtPointer));
+}
 
-   	screen::write("Test IDT\n");
-	asm volatile("int $200");
-   	screen::write("Test IDT: DONE\n");
+void interrupt::enable()
+{
    	screen::write("enable interrupts\n");
 	asm volatile("sti");
    	screen::write("enable interrupts: DONE\n");
 }
+
+void interrupt::disable()
+{
+   	screen::write("enable interrupts\n");
+	asm volatile("cli");
+   	screen::write("enable interrupts: DONE\n");
 }
