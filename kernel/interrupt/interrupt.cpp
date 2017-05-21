@@ -3,7 +3,7 @@
 #include "../screen/screen.h"
 
 /**
- Interrupt Table: (intel manual: 6.4.1)
+ Interrupt Table: (intel manual: 6.4.1, reference: 6.15)
  0     #DE    Divide Error
               DIV and IDIV instructions.
  1     #DB    Debug
@@ -127,16 +127,43 @@ struct interrupt_frame
 	uword_t ss;
 };
 
+__attribute__ ((interrupt))
+void pageFault(interrupt_frame *frame)
+{
+	screen::write("\ninterrupt page fault...");
+	screen::write("\n  ip:   ");
+	screen::writePtr((void*)frame->ip);
+	screen::write("\n  cs:   ");
+	screen::writePtr((void*)frame->cs);
+	screen::write("\n  flags:");
+	screen::writePtr((void*)frame->flags);
+	screen::write("\n  sp:   ");
+	screen::writePtr((void*)frame->sp);
+	screen::write("\n  ss:   ");
+	screen::writePtr((void*)frame->ss);
+	screen::write("\n");
+}
+
 template<int n>
 __attribute__ ((interrupt))
 void testhandler(interrupt_frame *frame)
 {
-	screen::printnl("interrupt", n, "...");
-	screen::printnl("  ip:   ", frame->ip);
-	screen::printnl("  cs:   ", frame->cs);
-	screen::printnl("  flags:", frame->flags);
-	screen::printnl("  sp:   ", frame->sp);
-	screen::printnl("  ss:   ", frame->ss);
+	screen::write("\ninterrupt ");
+	screen::writeInt(n);
+	screen::write(" page fault...");
+	screen::write("\n  ip:   ");
+	screen::writePtr((void*)frame->ip);
+	screen::write("\n  cs:   ");
+	screen::writePtr((void*)frame->cs);
+	screen::write("\n  flags:");
+	screen::writePtr((void*)frame->flags);
+	screen::write("\n  sp:   ");
+	screen::writePtr((void*)frame->sp);
+	screen::write("\n  ss:   ");
+	screen::writePtr((void*)frame->ss);
+	screen::write("\n");
+
+	while(true);
 }
 
 void setISR(int interrupt, void(*handler)(interrupt_frame*), uint16_t selector, uint8_t flags)
@@ -196,7 +223,7 @@ void interrupt::init()
 	setISR(11, testhandler<11>, 0x08, 0x8E);
 	setISR(12, testhandler<12>, 0x08, 0x8E);
 	setISR(13, testhandler<13>, 0x08, 0x8E);
-	setISR(14, testhandler<14>, 0x08, 0x8E);
+	setISR(14, pageFault, 0x08, 0x8E);
 	setISR(15, testhandler<15>, 0x08, 0x8E);
 	setISR(16, testhandler<16>, 0x08, 0x8E);
 	setISR(17, testhandler<17>, 0x08, 0x8E);
