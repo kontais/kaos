@@ -1,5 +1,5 @@
 #include "screen.h"
-#include <stdint.h>
+#include <cstdint>
 #include <stddef.h>
 
 
