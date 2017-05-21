@@ -31,7 +31,7 @@ $(ISO): $(ISODIR)/boot/kernel.bin $(ISODIR)/boot/grub/grub.cfg
 	grub-mkrescue -o $(ISO) $(ISODIR)
 
 bochs: $(ISO)
-	bochs -rc bochscommands
+	DISPLAY=:0 bochs -rc bochscommands
 
 qemu: $(ISO)
 	qemu-system-x86_64 -cdrom myos.iso -monitor stdio -curses
