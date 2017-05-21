@@ -3,26 +3,11 @@
 #include "paging_structures.h"
 #include "../bootstrap/linker_symbols.h"
 #include "../screen/screen.h"
+#include <string.h>
+
 
 //#define PRINT_PAGING
 
-static void zeromem(void* target, uint64_t count)
-{
-	auto t = reinterpret_cast<uint8_t*>(target);
-
-	for(uint64_t i = 0; i < count; i++)
-	{
-		t[i] = 0;
-	}
-}
-//xp /1024wx 0x400000
-//x /4096wx 0x400000
-//xp /4096wx 0x400000
-//xp /2048wx 0x400000
-//x /4096wx 0x101000
-//xp /1024wx 0x101000
-// info tab
-// 0 4 8 C
 // where in memory will be the initial pagetagles
 uint8_t* physicalPageTable = (uint8_t*)0x400000ULL;
 uint8_t* const mappedPageTable = (uint8_t*)0xFFFFFFFF80000000ULL;
@@ -34,7 +19,7 @@ public:
 	{
 		physicalPageTable = reinterpret_cast<uint8_t*>(paging::allocator::allocateHugePage());
 
-		zeromem(physicalPageTable, pageTableMapSize);
+		memset(physicalPageTable, 0, pageTableMapSize);
 
 		nextFreePageTable = physicalPageTable;
 		masterPageTable = physicalPageTable;
@@ -112,7 +97,7 @@ public:
 		screen::writePtr(nextFreePageTable);
 #endif
 
-		zeromem(page, 4096);
+		memset(page, 0, 4096);
 
 		return page;
 	}
@@ -135,7 +120,7 @@ private:
 
 PageTables pageTables;
 
-void mapPage(uint64_t physicalAddress, const void* linearAddress, const bool use2MB, const uint64_t flags = paging::writeable)
+void paging::mapPage(uint64_t physicalAddress, const void* linearAddress, const bool use2MB, const uint64_t flags)
 {
 	using namespace screen;
 	using namespace paging;

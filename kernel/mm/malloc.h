@@ -522,8 +522,8 @@ MAX_RELEASE_CHECK_RATE   default: 4095 unless not HAVE_MMAP
   disable, set to MAX_SIZE_T. This may lead to a very slight speed
   improvement at the expense of carrying around more memory.
 */
-typedef unsigned int size_t;
-typedef unsigned int ptrdiff_t;
+typedef unsigned long size_t;
+typedef unsigned long ptrdiff_t;
 /* Version identifier to allow people to support multiple versions */
 #ifndef DLMALLOC_VERSION
 #define DLMALLOC_VERSION 20806

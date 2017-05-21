@@ -1,6 +1,7 @@
 #include "screen.h"
 #include <cstdint>
 #include <stddef.h>
+#include <string.h>
 
 
 //using namespace screen;
@@ -12,17 +13,6 @@ constexpr size_t VGA_HEIGHT = 25;
 static uint16_t* screenBuf = (uint16_t*) 0xB8000;
 static size_t terminalColumn = 0;
 static size_t terminalRow = 0;
-
-static void copyMem(void* destP, void* srcP, size_t amount)
-{
-	auto dest = static_cast<char*>(destP);
-	auto src = static_cast<char*>(srcP);
-
-	for(size_t i = 0; i < amount; ++i)
-	{
-		dest[i]=src[i];
-	}
-}
 
 static uint16_t combine(char c, screen::ForegroundColor fgColor, screen::BackgroundColor bgColor)
 {
@@ -160,7 +150,7 @@ void screen::scroll(int amount)
 	{
 		for (size_t y = 1; y < VGA_HEIGHT; y++)
 		{
-			copyMem(&screenBuf[(y-1)*VGA_WIDTH], &screenBuf[y*VGA_WIDTH], VGA_WIDTH * 2);
+			memcpy(&screenBuf[(y-1)*VGA_WIDTH], &screenBuf[y*VGA_WIDTH], VGA_WIDTH * 2);
 		}
 		for(size_t n = 0; n < VGA_WIDTH; ++n)
 		{

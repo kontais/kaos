@@ -36,5 +36,5 @@ typedef unsigned long uintptr_t;
 typedef signed long intmax_t;
 typedef unsigned long uintmax_t;
 
-typedef signed long ptrdiff_t;
+typedef unsigned long ptrdiff_t;
 typedef unsigned long size_t;

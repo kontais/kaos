@@ -19,6 +19,7 @@
 
 const extern void* _text_start;
 
+#include "mm/malloc.h"
 
 #if defined(__cplusplus)
 extern "C" /* Use C linkage for kernel_main. */
@@ -37,6 +38,14 @@ void kernel_main(int32_t /*multibootMagic*/, multiboot::Header* multibootHeader)
 	//screen::write((const char*)multibootInfo->boot_loader_name);
 	screen::write("\n");
 	
-	
-	//screen::write("the end!\n");
+	for(int i=0;i<10;i++)
+	{
+		//const auto x = new int;
+		const auto p = malloc(4200);
+		screen::write("\nmalloc:");
+		//screen::writePtr(x);
+		screen::write(",");
+		screen::writePtr(p);
+		free(p);
+	}
 }
