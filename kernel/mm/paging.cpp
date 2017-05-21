@@ -1,7 +1,10 @@
 #include "paging.h"
+#include "page_allocator.h"
 #include "paging_structures.h"
 #include "../bootstrap/linker_symbols.h"
 #include "../screen/screen.h"
+
+//#define PRINT_PAGING
 
 static void zeromem(void* target, uint64_t count)
 {
@@ -21,7 +24,7 @@ static void zeromem(void* target, uint64_t count)
 // info tab
 // 0 4 8 C
 // where in memory will be the initial pagetagles
-uint8_t* const physicalPageTable = (uint8_t*)0x400000ULL;
+uint8_t* physicalPageTable = (uint8_t*)0x400000ULL;
 uint8_t* const mappedPageTable = (uint8_t*)0xFFFFFFFF80000000ULL;
 
 class PageTables
@@ -29,6 +32,8 @@ class PageTables
 public:
 	void init()
 	{
+		physicalPageTable = reinterpret_cast<uint8_t*>(paging::allocator::allocateHugePage());
+
 		zeromem(physicalPageTable, pageTableMapSize);
 
 		nextFreePageTable = physicalPageTable;
@@ -51,19 +56,25 @@ public:
 	{
 		auto pt = getPhysicalOffset(nextFreePageTable);
 
-	screen::write("\nmapPageTableTo:");
-	screen::writePtr(linearAddress);
-	screen::write("\nnextFreePageTable:");
-	screen::writePtr(nextFreePageTable);
-	screen::write(" --> ");
-	screen::writePtr((void*)pt);
+#ifdef PRINT_PAGING
+		screen::write("\nmapPageTableTo:");
+		screen::writePtr(linearAddress);
+		screen::write("\nnextFreePageTable:");
+		screen::writePtr(nextFreePageTable);
+		screen::write(" --> ");
+		screen::writePtr((void*)pt);
+#endif
 
 		masterPageTable = (uint8_t *)linearAddress;
 		nextFreePageTable = (uint8_t *)getVirtualOffset(pt);
-	screen::write("\nnextFreePageTable:");
-	screen::writePtr(nextFreePageTable);
-	screen::write(" --> ");
-	screen::writePtr(nextFreePageTable);
+
+#ifdef PRINT_PAGING
+		screen::write("\nnextFreePageTable:");
+		screen::writePtr(nextFreePageTable);
+		screen::write(" --> ");
+		screen::writePtr(nextFreePageTable);
+#endif	
+
 	}
 
 	uint64_t getPhysicalOffset(void* address)
@@ -95,8 +106,11 @@ public:
 
 		int64_t* nextFree = (int64_t*)nextFreePageTable;
 		nextFreePageTable = nextFreePageTable + *nextFree;
-	screen::write("\nnextFreePageTable:");
-	screen::writePtr(nextFreePageTable);
+
+#ifdef PRINT_PAGING
+		screen::write("\nnextFreePageTable:");
+		screen::writePtr(nextFreePageTable);
+#endif
 
 		zeromem(page, 4096);
 
@@ -126,10 +140,12 @@ void mapPage(uint64_t physicalAddress, const void* linearAddress, const bool use
 	using namespace screen;
 	using namespace paging;
 
+#ifdef PRINT_PAGING
 	screen::write("\nmapPage:");
 	screen::writePtr(linearAddress);
 	screen::write(" --> ");
 	screen::writePtr((void*)physicalAddress);
+#endif
 
 	uint64_t lAddr = (uint64_t)linearAddress;
 	auto p4Offset = (lAddr >> (12+9+9+9)) & 0x1FF;
@@ -142,19 +158,23 @@ void mapPage(uint64_t physicalAddress, const void* linearAddress, const bool use
 		*p4Entry = (pagePhysical  & addressMask) | present | writeable;
 	}
 
+#ifdef PRINT_PAGING
 	screen::write("\np4Offset:");
 	writeInt(p4Offset);
 	screen::write(" p4Entry:");
 	writePtr((void*)*p4Entry);
+#endif
 
 	const auto p3Base = (uint64_t*)pageTables.getVirtualOffset(*p4Entry & addressMask);
 	auto p3Offset = (lAddr >> (12+9+9)) & 0x1FF;
 	auto p3Entry = &p3Base[p3Offset];
 
+#ifdef PRINT_PAGING
 	screen::write("\np3Offset:");
 	writeInt(p3Offset);
 	screen::write(" p3Base:");
 	writePtr((void*)p3Base);
+#endif
 
 	if(!(*p3Entry & present))
 	{
@@ -163,8 +183,10 @@ void mapPage(uint64_t physicalAddress, const void* linearAddress, const bool use
 		*p3Entry = (pagePhysical  & addressMask) | present | writeable;
 	}
 
+#ifdef PRINT_PAGING
 	screen::write(" p3Entry:");
 	writePtr((void*)*p3Entry);
+#endif
 
 	const auto p2Base = (uint64_t*)pageTables.getVirtualOffset(*p3Entry & addressMask);
 	auto p2Offset = (lAddr >> (12+9)) & 0x1FF;
@@ -175,12 +197,14 @@ void mapPage(uint64_t physicalAddress, const void* linearAddress, const bool use
 		if(use2MB || *p2Entry & page2Mb)
 		{
 			*p2Entry = (physicalAddress  & addressMask) | present | page2Mb | flags;
+#ifdef PRINT_PAGING
 			screen::write("\np2Offset:");
 			writeInt(p2Offset);
 			screen::write(" p2Base:");
 			writePtr((void*)p2Base);
 			screen::write(" p2Entry:");
 			writePtr((void*)*p2Entry);
+#endif
 			return;
 		}
 		else
@@ -191,12 +215,14 @@ void mapPage(uint64_t physicalAddress, const void* linearAddress, const bool use
 		}
 	}
 
+#ifdef PRINT_PAGING
 	screen::write("\np2Offset:");
 	writeInt(p2Offset);
 	screen::write(" p2Base:");
 	writePtr((void*)p2Base);
 	screen::write(" p2Entry:");
 	writePtr((void*)*p2Entry);
+#endif
 
 	const auto p1Base = (uint64_t*)pageTables.getVirtualOffset(*p2Entry & addressMask);
 	auto p1Offset = (lAddr >> (12)) & 0x1FF;
@@ -207,12 +233,14 @@ void mapPage(uint64_t physicalAddress, const void* linearAddress, const bool use
 		*p1Entry = (physicalAddress  & addressMask) | present | flags;
 	}
 
+#ifdef PRINT_PAGING
 	screen::write("\np1Offset:");
 	writeInt(p1Offset);
 	screen::write(" p1Base:");
 	writePtr((void*)p1Base);
 	screen::write(" p1Entry:");
 	writePtr((void*)*p1Entry);
+#endif
 }
 
 void map(uint64_t physicalAddress, const void* linearAddress, int64_t size, const uint64_t flags = paging::writeable)
