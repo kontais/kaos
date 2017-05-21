@@ -2,7 +2,7 @@ LIBC_OBJ = \
 	libc/src/libc.o
 
 LIBCXX_OBJ = \
-#	libcxx/src/new.o
+	libcxx/src/new.o
 
 OBJ = \
 	$(LIBC_OBJ) \
@@ -31,8 +31,8 @@ ROOT_DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 JEMALLOC_DEFINES=-DUSE_SPIN_LOCKS=0 -DHAVE_MORECORE=0 -DHAVE_MMAP=1 -DHAVE_MREMAP=0 -DNO_MALLOC_STATS=1 \
   -DLACKS_UNISTD_H -DLACKS_FCNTL_H -DLACKS_SYS_PARAM_H \
   -DLACKS_STRINGS_H -DLACKS_ERRNO_H \
-  -DLACKS_STDLIB_H -DLACKS_SCHED_H -DLACKS_TIME_H -DMALLOC_FAILURE_ACTION \
-  -DUSE_LOCKS=0
+  -DLACKS_SCHED_H -DLACKS_TIME_H -DMALLOC_FAILURE_ACTION \
+  -DUSE_LOCKS=0 -DDEFAULT_GRANULARITY=2097152
 LIB_C=-I$(ROOT_DIR)/libc/include -D__ELF__ -D_ISOC11_SOURCE -nostdinc
 LIB_CXX=-I$(ROOT_DIR)/libcxx/include -D__ELF__ -D_LIBCPP_HAS_NO_THREADS -nostdinc++
 CFLAGS=-mno-red-zone -mcmodel=large -ffreestanding -O2 -Wall -Wextra -Werror --target=x86_64-pc-none-elf $(LIB_C) $(JEMALLOC_DEFINES)

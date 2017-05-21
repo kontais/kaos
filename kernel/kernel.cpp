@@ -40,12 +40,13 @@ void kernel_main(int32_t /*multibootMagic*/, multiboot::Header* multibootHeader)
 	
 	for(int i=0;i<10;i++)
 	{
-		//const auto x = new int;
-		const auto p = malloc(4200);
+		const auto p = malloc(420000);
+		const auto x = new int;
 		screen::write("\nmalloc:");
-		//screen::writePtr(x);
+		screen::writePtr(x);
 		screen::write(",");
 		screen::writePtr(p);
 		free(p);
+		new int;
 	}
 }

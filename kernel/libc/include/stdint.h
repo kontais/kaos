@@ -38,3 +38,7 @@ typedef unsigned long uintmax_t;
 
 typedef unsigned long ptrdiff_t;
 typedef unsigned long size_t;
+
+#ifndef __cplusplus
+typedef unsigned long wchar_t;
+#endif

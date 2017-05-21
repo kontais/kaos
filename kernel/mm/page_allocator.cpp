@@ -193,8 +193,8 @@ uint64_t paging::allocator::allocatePage()
 			if(isFree(pageLocation))
 			{
 				markPage(pageLocation, false);
-				screen::write("\nallocatedPage: ");
-				screen::writePtr((void*)pageLocation);
+				//screen::write("\nallocatedPage: ");
+				//screen::writePtr((void*)pageLocation);
 				return pageLocation;
 			}
 		}
@@ -211,8 +211,8 @@ uint64_t paging::allocator::allocateHugePage()
 		if(isFreeHuge(offset))
 		{
 			markPageHuge(offset, false);
-			screen::write("\nallocatedHugePage: ");
-			screen::writePtr((void*)offset);
+			//screen::write("\nallocatedHugePage: ");
+			//screen::writePtr((void*)offset);
 			return offset;
 		}
 	}
