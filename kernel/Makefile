@@ -7,6 +7,8 @@ LIBCXX_OBJ = \
 OBJ = \
 	$(LIBC_OBJ) \
 	$(LIBCXX_OBJ) \
+	acpi/acpi.o \
+	acpi/dsdt.o \
 	bootstrap/boot.o \
 	bootstrap/long_mode_init.o \
 	bootstrap/multiboot.o \

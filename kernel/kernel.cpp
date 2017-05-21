@@ -16,6 +16,7 @@
 #include "interrupt/interrupt.h"
 #include "mm/page_allocator.h"
 #include "mm/paging.h"
+#include "acpi/acpi.h"
 
 const extern void* _text_start;
 
@@ -35,7 +36,7 @@ void kernel_main(int32_t /*multibootMagic*/, multiboot::Header* multibootHeader)
 	// HEAP available starting here
 	/////////////////////////////////////////
 
-
+	acpi::init();
 
 	//screen::write("\nmultiboot boot_loader_name addr: ");
 	//screen::writePtr((void*)multibootInfo->boot_loader_name);
@@ -43,7 +44,7 @@ void kernel_main(int32_t /*multibootMagic*/, multiboot::Header* multibootHeader)
 	//screen::write((const char*)multibootInfo->boot_loader_name);
 	screen::write("\n");
 	
-	for(int i=0;i<10;i++)
+	/*for(int i=0;i<10;i++)
 	{
 		const auto p = malloc(420000);
 		const auto x = new int;
@@ -53,5 +54,5 @@ void kernel_main(int32_t /*multibootMagic*/, multiboot::Header* multibootHeader)
 		screen::writePtr(p);
 		free(p);
 		new int;
-	}
+	}*/
 }
