@@ -228,7 +228,7 @@ void paging::mapPage(uint64_t physicalAddress, const void* linearAddress, const 
 #endif
 }
 
-void map(uint64_t physicalAddress, const void* linearAddress, int64_t size, const uint64_t flags = paging::writeable)
+void paging::mapRange(uint64_t physicalAddress, const void* linearAddress, int64_t size, const uint64_t flags)
 {
 	using namespace paging;
 
@@ -242,10 +242,11 @@ void map(uint64_t physicalAddress, const void* linearAddress, int64_t size, cons
 	}
 }
 
+
 #define POFF(x) (uint64_t)(&_##x##_start) - (uint64_t)(&_kernel_virtual_offset) + (uint64_t)(&_kernel_physical_base)
 #define VOFF(x) &_##x##_start
 #define LEN(x) (int64_t)(&_##x##_end) - (int64_t)(&_##x##_start)
-#define KMAP(x, flags) map(POFF(x), VOFF(x), LEN(x), flags)
+#define KMAP(x, flags) mapRange(POFF(x), VOFF(x), LEN(x), flags)
 
 void paging::init()
 {
