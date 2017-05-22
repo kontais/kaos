@@ -12,6 +12,16 @@
 uint8_t* physicalPageTable = (uint8_t*)0x400000ULL;
 uint8_t* const mappedPageTable = (uint8_t*)0xFFFFFFFF80000000ULL;
 
+bool ptMoved = false;
+void reloadPageTables()
+{
+	if(ptMoved)
+	asm volatile("movq %%cr3, %%rax; movq %%rax, %%cr3;"
+					:
+					:
+					: "rax");
+}
+
 class PageTables
 {
 public:
@@ -183,7 +193,7 @@ void paging::mapPage(uint64_t physicalAddress, const void* linearAddress, const 
 		{
 			*p2Entry = (physicalAddress  & addressMask) | present | page2Mb | flags;
 #ifdef PRINT_PAGING
-			screen::write("\np2Offset:");
+			screen::write("\np2Offset-x:");
 			writeInt(p2Offset);
 			screen::write(" p2Base:");
 			writePtr((void*)p2Base);
@@ -197,6 +207,22 @@ void paging::mapPage(uint64_t physicalAddress, const void* linearAddress, const 
 			auto page = pageTables.allocatePageTablePage();
 			auto pagePhysical = pageTables.getPhysicalOffset(page);
 			*p2Entry = (pagePhysical  & addressMask) | present | writeable;
+		}
+	}
+	else
+	{
+		if(use2MB)
+		{
+			*p2Entry = (physicalAddress  & addressMask) | present | page2Mb | flags;
+#ifdef PRINT_PAGING
+			screen::write("\np2Offset-y:");
+			writeInt(p2Offset);
+			screen::write(" p2Base:");
+			writePtr((void*)p2Base);
+			screen::write(" p2Entry:");
+			writePtr((void*)*p2Entry);
+#endif
+			return;
 		}
 	}
 
@@ -226,6 +252,8 @@ void paging::mapPage(uint64_t physicalAddress, const void* linearAddress, const 
 	screen::write(" p1Entry:");
 	writePtr((void*)*p1Entry);
 #endif
+
+	reloadPageTables();
 }
 
 void paging::mapRange(uint64_t physicalAddress, const void* linearAddress, int64_t size, const uint64_t flags)
@@ -239,6 +267,20 @@ void paging::mapRange(uint64_t physicalAddress, const void* linearAddress, int64
 
 		physicalAddress += pageSize;
 		lAddress += pageSize;
+	}
+}
+
+void paging::mapRangeHuge(uint64_t physicalAddress, const void* linearAddress, int64_t size, const uint64_t flags)
+{
+	using namespace paging;
+
+	char* lAddress = (char*)linearAddress;
+	for(; size > 0; size -= pageSizeHuge)
+	{
+		mapPage(physicalAddress, lAddress, true, flags);
+
+		physicalAddress += pageSizeHuge;
+		lAddress += pageSizeHuge;
 	}
 }
 
@@ -270,4 +312,6 @@ void paging::init()
 					: );
 
 	pageTables.mapPageTableTo(mappedPageTable);
+
+	ptMoved = true;
 }
