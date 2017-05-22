@@ -142,6 +142,8 @@ void pageFault(interrupt_frame *frame)
 	screen::write("\n  ss:   ");
 	screen::writePtr((void*)frame->ss);
 	screen::write("\n");
+
+	while(true);
 }
 
 template<int n>
