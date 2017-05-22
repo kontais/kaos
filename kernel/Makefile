@@ -1,24 +1,27 @@
+include acpi/acpica/acpica.mk
+
 LIBC_OBJ = \
-	libc/src/libc.o
+	build/libc/src/libc.o
 
 LIBCXX_OBJ = \
-	libcxx/src/new.o
+	build/libcxx/src/new.o
 
 OBJ = \
 	$(LIBC_OBJ) \
 	$(LIBCXX_OBJ) \
-	acpi/acpi.o \
-	acpi/dsdt.o \
-	bootstrap/boot.o \
-	bootstrap/long_mode_init.o \
-	bootstrap/multiboot.o \
-	bootstrap/multiboot_header.o \
-	interrupt/interrupt.o \
-	mm/malloc.o \
-	mm/paging.o \
-	mm/page_allocator.o \
-	screen/screen.o \
-	kernel.o
+	$(ACPICA_OBJ) \
+	build/acpi/acpi.o \
+	build/acpi/dsdt.o \
+	build/bootstrap/boot.o \
+	build/bootstrap/long_mode_init.o \
+	build/bootstrap/multiboot.o \
+	build/bootstrap/multiboot_header.o \
+	build/interrupt/interrupt.o \
+	build/mm/malloc.o \
+	build/mm/paging.o \
+	build/mm/page_allocator.o \
+	build/screen/screen.o \
+	build/kernel.o
 
 
 KERNEL_TARGET=kernel.bin
@@ -35,8 +38,8 @@ JEMALLOC_DEFINES=-DUSE_SPIN_LOCKS=0 -DHAVE_MORECORE=0 -DHAVE_MMAP=1 -DHAVE_MREMA
   -DLACKS_STRINGS_H -DLACKS_ERRNO_H \
   -DLACKS_SCHED_H -DLACKS_TIME_H -DMALLOC_FAILURE_ACTION \
   -DUSE_LOCKS=0 -DDEFAULT_GRANULARITY=2097152
-LIB_C=-I$(ROOT_DIR)/libc/include -D__ELF__ -D_ISOC11_SOURCE -nostdinc
-LIB_CXX=-I$(ROOT_DIR)/libcxx/include -D__ELF__ -D_LIBCPP_HAS_NO_THREADS -nostdinc++
+LIB_C=-I. -Ilibc/include -D__ELF__ -D_ISOC11_SOURCE -nostdinc
+LIB_CXX=-Ilibcxx/include -D__ELF__ -D_LIBCPP_HAS_NO_THREADS -nostdinc++
 CFLAGS=-mno-red-zone -mcmodel=large -ffreestanding -O2 -Wall -Wextra -Werror --target=x86_64-pc-none-elf $(LIB_C) $(JEMALLOC_DEFINES)
 CXXFLAGS= --std=c++1z -fno-exceptions -fno-rtti $(LIB_CXX) $(CFLAGS)
 
@@ -45,16 +48,20 @@ CXXFLAGS= --std=c++1z -fno-exceptions -fno-rtti $(LIB_CXX) $(CFLAGS)
 
 all: kernel.bin
 
-%.o: %.c
+build/%.o: %.c
+	@mkdir -p $(dir $@)
 	$(CC) -c $(CFLAGS) $< -MMD -o $@
 
-%.o: %.cpp
+build/%.o: %.cpp
+	@mkdir -p $(dir $@)
 	$(CXX) -c $(CXXFLAGS) $< -MMD -o $@
 
-%.o: %.s
+build/%.o: %.s
+	@mkdir -p $(dir $@)
 	$(AS) $< -o $@
 
-%.o: %.asm
+build/%.o: %.asm
+	@mkdir -p $(dir $@)
 	$(NASM) -felf64 $< -o $@
 
 clean:

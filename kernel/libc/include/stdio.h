@@ -5,7 +5,7 @@ extern "C" {
 #endif
 
 typedef void FILE;
-typedef long va_list;
+typedef __builtin_va_list va_list;
 typedef long fpos_t;
 
 #define NULL nullptr

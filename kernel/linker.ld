@@ -13,8 +13,8 @@ SECTIONS
 	{
 		/* ensure that the multiboot header is at the beginning */
 		KEEP(*(.multiboot_header))
-		bootstrap/boot.o
-		bootstrap/long_mode_init.o
+		build/bootstrap/boot.o
+		build/bootstrap/long_mode_init.o
 	}
 
 	. = _kernel_virtual_offset;
