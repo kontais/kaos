@@ -56,6 +56,7 @@ namespace screen
 	void writeByte(int byte);
 	void writePtr(const void* ptr);
 	void writeInt(int64_t i);
+	void writeUInt(uint64_t i);
 
 	template<typename T>
 	void write(const T* ptr)

@@ -52,6 +52,11 @@ void screen::putChar(int x, int y, char c, ForegroundColor fgColor, BackgroundCo
 
 void screen::putChar(char c, ForegroundColor fgColor, BackgroundColor bgColor)
 {
+	if(c == '\n')
+	{
+		newLine();
+		return;
+	}
 	putChar(terminalColumn, terminalRow, c, fgColor, bgColor);
 
 	terminalColumn++;
@@ -124,6 +129,30 @@ void screen::writeInt(int64_t i)
 		i = -i;
 	}
 	else if(i == 0)
+	{
+		putChar('0');
+		return;
+	}
+
+	while(div <= i)
+	{
+		div *= 10;
+	}
+
+	div /= 10;
+	while(div > 0)
+	{
+		auto pos = i / div;
+		putChar(static_cast<char>(pos+'0'));
+		i -= pos * div;
+		div /= 10;
+	}
+}
+
+void screen::writeUInt(uint64_t i)
+{
+	uint64_t div = 1;
+	if(i == 0)
 	{
 		putChar('0');
 		return;
