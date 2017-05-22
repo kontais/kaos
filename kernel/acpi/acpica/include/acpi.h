@@ -152,6 +152,10 @@
 #ifndef __ACPI_H__
 #define __ACPI_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Public include files for use by code that will interface to ACPICA.
  *
@@ -171,5 +175,9 @@
 #include "acpiosxf.h"           /* OSL interfaces (ACPICA-to-OS) */
 #include "acpixf.h"             /* ACPI core subsystem external interfaces */
 #include "platform/acenvex.h"   /* Extra environment-specific items */
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __ACPI_H__ */

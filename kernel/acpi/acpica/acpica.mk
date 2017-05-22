@@ -178,7 +178,8 @@ ACPICA_UTILITIES_OBJ = \
 	build/acpi/acpica/utilities/utxfmutex.o
 
 ACPOICA_OS_OBJ = \
-	build/acpi/acpica/kaos.o
+	build/acpi/acpica/kaos.o \
+	build/acpi/acpica/printf.o
 
 ACPICA_OBJ = \
 	$(ACPICA_DISPATCHER_OBJ) \
@@ -196,8 +197,8 @@ ACPICA_INCLUDE = acpi/acpica/include
 
 build/acpi/acpica/%.o: acpi/acpica/src/%.c
 	@mkdir -p $(dir $@)
-	$(CC) -c -I$(ACPICA_INCLUDE) -mno-red-zone -mcmodel=large -ffreestanding -O2 --target=x86_64-pc-none-elf $< -MMD -o $@
+	$(CC) -c -I$(ACPICA_INCLUDE) $(CFLAGS_LIGHT) $< -MMD -o $@
 
 build/acpi/acpica/%.o: acpi/acpica/%.cpp
 	@mkdir -p $(dir $@)
-	$(CXX) -c -I. -I$(ACPICA_INCLUDE) $(LIB_CXX) $(LIB_C) -mno-red-zone -mcmodel=large -ffreestanding -O2 --target=x86_64-pc-none-elf --std=c++1z -fno-exceptions -fno-rtti $< -MMD -o $@
+	$(CXX) -c -I. -I$(ACPICA_INCLUDE) $(CXXFLAGS_LIGHT) --std=c++1z -fno-exceptions -fno-rtti $< -MMD -o $@

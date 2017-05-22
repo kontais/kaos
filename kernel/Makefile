@@ -42,6 +42,8 @@ LIB_C=-I. -Ilibc/include -D__ELF__ -D_ISOC11_SOURCE -nostdinc
 LIB_CXX=-Ilibcxx/include -D__ELF__ -D_LIBCPP_HAS_NO_THREADS -nostdinc++
 CFLAGS=-mno-red-zone -mcmodel=large -ffreestanding -O2 -Wall -Wextra -Werror --target=x86_64-pc-none-elf $(LIB_C) $(JEMALLOC_DEFINES)
 CXXFLAGS= --std=c++1z -fno-exceptions -fno-rtti $(LIB_CXX) $(CFLAGS)
+CFLAGS_LIGHT=-mno-red-zone -mcmodel=large -ffreestanding -O2 --target=x86_64-pc-none-elf $(LIB_C) $(JEMALLOC_DEFINES)
+CXXFLAGS_LIGHT= --std=c++1z -fno-exceptions -fno-rtti $(LIB_CXX) $(CFLAGS_LIGHT)
 
 
 .PHONY: all test clean
@@ -51,6 +53,11 @@ all: kernel.bin
 build/%.o: %.c
 	@mkdir -p $(dir $@)
 	$(CC) -c $(CFLAGS) $< -MMD -o $@
+
+# special handling for acpi includer
+build/acpi/acpi.o: acpi/acpi.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) -c $(CXXFLAGS_LIGHT) $< -MMD -o $@
 
 build/%.o: %.cpp
 	@mkdir -p $(dir $@)
