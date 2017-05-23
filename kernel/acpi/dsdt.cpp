@@ -1,5 +1,5 @@
-#include <cstdint>
-#include "../screen/screen.h"
+﻿#include <cstdint>
+#include <screen/screen.h>
 
 
 namespace acpi

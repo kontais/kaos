@@ -1,6 +1,6 @@
-#include "interrupt.h"
+﻿#include "interrupt.h"
 #include <cstdint>
-#include "../screen/screen.h"
+#include <screen/screen.h>
 
 /**
  Interrupt Table: (intel manual: 6.4.1, reference: 6.15)

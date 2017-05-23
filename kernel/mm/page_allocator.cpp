@@ -1,6 +1,6 @@
-#include "page_allocator.h"
-#include "../screen/screen.h"
-#include "../bootstrap/linker_symbols.h"
+﻿#include "page_allocator.h"
+#include <screen/screen.h>
+#include <bootstrap/linker_symbols.h>
 #include <cstdint>
 
 

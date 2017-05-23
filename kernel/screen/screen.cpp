@@ -1,7 +1,7 @@
-#include "screen.h"
+﻿#include "screen.h"
 #include <cstdint>
-#include <stddef.h>
-#include <string.h>
+#include <cstddef>
+#include <cstring>
 
 
 //using namespace screen;

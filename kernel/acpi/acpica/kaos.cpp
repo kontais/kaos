@@ -341,7 +341,12 @@ ACPI_STATUS AcpiOsInstallInterruptHandler (
     ACPI_OSD_HANDLER        ServiceRoutine,
     void                    *Context)
 {
-	screen::write("\n AcpiOsInstallInterruptHandler");
+	screen::write("\n AcpiOsInstallInterruptHandler: ");
+	screen::writeInt(InterruptNumber);
+	screen::write(", ");
+	screen::writePtr((void*)ServiceRoutine);
+	screen::write(", ");
+	screen::writePtr(Context);
     // TODO
 	return AE_OK;
 }
@@ -350,8 +355,11 @@ ACPI_STATUS AcpiOsRemoveInterruptHandler (
     UINT32                  InterruptNumber,
     ACPI_OSD_HANDLER        ServiceRoutine)
 {
-	screen::write("\n AcpiOsRemoveInterruptHandler");
-    // TODO
+	screen::write("\n AcpiOsRemoveInterruptHandler: ");
+ 	screen::writeInt(InterruptNumber);
+	screen::write(", ");
+	screen::writePtr((void*)ServiceRoutine);
+   // TODO
 	return AE_OK;
 }
 

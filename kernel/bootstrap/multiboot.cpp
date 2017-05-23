@@ -1,5 +1,5 @@
-#include "multiboot.h"
-#include "../screen/screen.h"
+﻿#include "multiboot.h"
+#include <screen/screen.h>
 
 
 struct MultibyteTag

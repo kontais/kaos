@@ -1,9 +1,9 @@
-#include "paging.h"
+﻿#include "paging.h"
 #include "page_allocator.h"
 #include "paging_structures.h"
-#include "../bootstrap/linker_symbols.h"
-#include "../screen/screen.h"
-#include <string.h>
+#include <bootstrap/linker_symbols.h>
+#include <screen/screen.h>
+#include <cstring>
 
 
 //#define PRINT_PAGING

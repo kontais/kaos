@@ -25,7 +25,8 @@
 /* Use native linux version of AcpiOsAllocateZeroed */
 
 #define USE_NATIVE_ALLOCATE_ZEROED 1
-#define ACPI_USE_LOCAL_CACHE 1
+#define ACPI_CACHE_T                ACPI_MEMORY_LIST
+#define ACPI_USE_LOCAL_CACHE        1
 
 /*#define ACPI_MSG_ERROR          KERN_ERR "ACPI Error: "
 #define ACPI_MSG_EXCEPTION      KERN_ERR "ACPI Exception: "

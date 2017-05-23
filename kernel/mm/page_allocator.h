@@ -1,6 +1,6 @@
-#pragma once
+﻿#pragma once
 
-#include "../bootstrap/multiboot.h"
+#include <bootstrap/multiboot.h>
 
 
 namespace paging::allocator

@@ -1,4 +1,4 @@
-#include "bootstrap/multiboot.h"
+﻿#include "bootstrap/multiboot.h"
 #include <stddef.h>
 #include <cstdint>
  
@@ -12,11 +12,11 @@
 //#error "This tutorial needs to be compiled with a ix86-elf compiler"
 #endif
 
-#include "screen/screen.h"
-#include "interrupt/interrupt.h"
-#include "mm/page_allocator.h"
-#include "mm/paging.h"
-#include "acpi/acpi.h"
+#include <screen/screen.h>
+#include <interrupt/interrupt.h>
+#include <mm/page_allocator.h>
+#include <mm/paging.h>
+#include <acpi/acpi.h>
 
 const extern void* _text_start;
 
